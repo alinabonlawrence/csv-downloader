@@ -86,6 +86,18 @@ app.prepare().then(async () => {
     }
   );
 
+  router.get("/products", async (ctx) => {
+    const session = await Shopify.Utils.loadCurrentSession(ctx.req, ctx.res);
+    const client = new Shopify.Clients.Rest(session.shop, session.accessToken);
+
+    const data = await client.get({
+      path: "products",
+    });
+    console.log(data);
+    ctx.status = 200;
+    ctx.body = data;
+  });
+
   router.get("(/_next/static/.*)", handleRequest); // Static content is clear
   router.get("/_next/webpack-hmr", handleRequest); // Webpack content is clear
   router.get("(.*)", async (ctx) => {

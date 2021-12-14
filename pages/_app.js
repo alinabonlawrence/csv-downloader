@@ -3,10 +3,12 @@ import { ApolloProvider } from "react-apollo";
 import App from "next/app";
 import { AppProvider } from "@shopify/polaris";
 import { Provider, useAppBridge } from "@shopify/app-bridge-react";
-import { authenticatedFetch } from "@shopify/app-bridge-utils";
+import { authenticatedFetch, getSessionToken } from "@shopify/app-bridge-utils";
 import { Redirect } from "@shopify/app-bridge/actions";
 import "@shopify/polaris/dist/styles.css";
 import translations from "@shopify/polaris/locales/en.json";
+import "./../sass/main.css";
+import axios from "axios";
 
 function userLoggedInFetch(app) {
   const fetchFunction = authenticatedFetch(app);
@@ -40,11 +42,21 @@ function MyProvider(props) {
     },
   });
 
+  // Axios
+  const authAxios = axios.create();
+
+  authAxios.interceptors.request.use(function (config) {
+    return getSessionToken(app).then((token) => {
+      config.headers["Authorization"] = `Bearer ${token}`;
+      return config;
+    });
+  });
+
   const Component = props.Component;
 
   return (
     <ApolloProvider client={client}>
-      <Component {...props} />
+      <Component {...props} authAxios={authAxios} />
     </ApolloProvider>
   );
 }
