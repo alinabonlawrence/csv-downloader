@@ -4,13 +4,6 @@ import SecondaryTabs from "../components/SecondaryTabs";
 
 function index({ authAxios }) {
   const [products, setProducts] = useState([]);
-  useEffect(() => {
-    authAxios.get("/products").then((result) => {
-      if (result !== undefined) {
-        console.log(result.body);
-      }
-    });
-  }, []);
 
   console.log(products);
 
@@ -25,35 +18,19 @@ function index({ authAxios }) {
   const tabs = [
     {
       id: "tab-1",
-      content: (
-        <Button>
-          <span className="text-bold">ホーム</span>
-        </Button>
-      ),
+      content: <div className="text-bold">ホーム</div>,
     },
     {
       id: "tab-2",
-      content: (
-        <Button>
-          <span className="text-bold">依頼主設定(伝票)</span>
-        </Button>
-      ),
+      content: <div className="text-bold">依頼主設定(伝票)</div>,
     },
     {
       id: "tab-3",
-      content: (
-        <Button>
-          <span className="text-bold">ヘッダー名変更</span>
-        </Button>
-      ),
+      content: <div className="text-bold">ヘッダー名変更</div>,
     },
     {
       id: "tab-4",
-      content: (
-        <Button>
-          <span className="text-bold">プラン情報</span>
-        </Button>
-      ),
+      content: <div className="text-bold">プラン情報</div>,
     },
   ];
   // End of Initial Tab Config
@@ -67,7 +44,7 @@ function index({ authAxios }) {
         <div className="tabContent--header">
           <Heading>フォーマット選択</Heading>
         </div>
-        <SecondaryTabs />
+        <SecondaryTabs authAxios={authAxios} />
       </div>
     );
   } else if (selected === 1) {

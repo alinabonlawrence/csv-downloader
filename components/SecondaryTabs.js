@@ -1,14 +1,57 @@
 import {
   Card,
+  DataTable,
   Heading,
   Page,
   RadioButton,
   Stack,
   Tabs,
 } from "@shopify/polaris";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { CSVLink } from "react-csv";
 
-function SecondaryTabs() {
+function SecondaryTabs({ authAxios }) {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    authAxios.get("/products").then((result) => {
+      if (result !== undefined) {
+        console.log(result);
+        setProducts(result.data.body.products);
+      }
+    });
+  }, [authAxios]);
+
+  const headers = [
+    { label: "Label", key: "title" },
+    { label: "Vendor", key: "vendor" },
+    { label: "Status ", key: "status" },
+    { label: "Images  ", key: "images" },
+  ];
+
+  const productData = products.map((product) => {
+    delete product.image;
+    delete product.options;
+    delete product.images;
+    delete product.variants;
+    return product;
+  });
+
+  console.log(...productData);
+
+  let singleProduct = productData[0];
+  let productHeaders = [];
+  if (singleProduct !== undefined) {
+    productHeaders = Object.keys(singleProduct);
+  }
+  console.log(productHeaders);
+
+  const prodRow = productData.map((p) => {
+    return Object.values(p);
+  });
+
+  console.log(prodRow);
+
   // Tag Config
   const [selected, setSelected] = useState(0);
 
@@ -46,6 +89,34 @@ function SecondaryTabs() {
     []
   );
   // End of Radio Config
+
+  DataTable;
+  const productTable = (
+    <Card>
+      <DataTable
+        columnContentTypes={[
+          "numeric",
+          "text",
+          "text",
+          "text",
+          "text",
+          "text",
+          "text",
+          "text",
+          "text",
+          "text",
+          "text",
+          "text",
+          "text",
+          "text",
+        ]}
+        headings={productHeaders}
+        rows={prodRow}
+      />
+    </Card>
+  );
+
+  // End of DataTable
 
   // RadioButton Content
   const radioButtonList = (
@@ -101,6 +172,8 @@ function SecondaryTabs() {
   // Tab Body
   let secondaryTabComponent = "";
   let text = "";
+  let csvDownload = "";
+  let productTables = "";
 
   if (selected === 0) {
     secondaryTabComponent = radioButtonList;
@@ -115,6 +188,13 @@ function SecondaryTabs() {
         </p>
       </div>
     );
+    csvDownload = (
+      <CSVLink data={products} headers={headers}>
+        Download me
+      </CSVLink>
+    );
+
+    productTables = productTable;
   } else if (selected === 1) {
     secondaryTabComponent = (
       <Page>
@@ -144,6 +224,8 @@ function SecondaryTabs() {
         </Tabs>
       </Card>
       {text}
+      {csvDownload}
+      {productTables}
     </div>
   );
 }
