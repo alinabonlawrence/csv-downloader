@@ -88,6 +88,8 @@ app.prepare().then(async () => {
 
   router.get("/products", async (ctx) => {
     let products = [];
+    let newPageInfo;
+
     const session = await Shopify.Utils.loadCurrentSession(ctx.req, ctx.res);
     const client = new Shopify.Clients.Rest(session.shop, session.accessToken);
 
@@ -96,20 +98,18 @@ app.prepare().then(async () => {
       query: { limit: "1" },
     });
     products = [...data.body.products];
+    newPageInfo = data.pageInfo.nextPage.query.page_info;
 
-    let newPageInfo = data.pageInfo.nextPage.query.page_info;
-    console.log(newPageInfo);
-
-    while (newPageInfo !== undefined) {
-      const addData = await client.get({
+    while (newPageInfo) {
+      let addData = await client.get({
         path: "products",
         query: { limit: "1", page_info: newPageInfo },
       });
-      console.log(newPageInfo);
+
       products = [...products, ...addData.body.products];
-      if (newPageInfo !== undefined) {
-        newPageInfo = addData.pageInfo.nextPage.query.page_info;
-      }
+      newPageInfo =
+        addData.pageInfo.nextPage !== undefined &&
+        addData.pageInfo.nextPage.query.page_info;
     }
 
     console.log(products);

@@ -16,8 +16,8 @@ function SecondaryTabs({ authAxios }) {
   useEffect(() => {
     authAxios.get("/products").then((result) => {
       if (result !== undefined) {
-        console.log(result);
-        setProducts(result.data.body.products);
+        console.log(result.data);
+        setProducts(result.data);
       }
     });
   }, [authAxios]);
