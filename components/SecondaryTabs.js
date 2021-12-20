@@ -8,7 +8,7 @@ import {
   Tabs,
 } from "@shopify/polaris";
 import React, { useCallback, useEffect, useState } from "react";
-import { CSVLink } from "react-csv";
+import { CSVDownload, CSVLink } from "react-csv";
 
 function SecondaryTabs({ authAxios }) {
   const [products, setProducts] = useState([]);
@@ -16,7 +16,7 @@ function SecondaryTabs({ authAxios }) {
   useEffect(() => {
     authAxios.get("/products").then((result) => {
       if (result !== undefined) {
-        console.log(result.data);
+        // console.log(result.data);
         setProducts(result.data);
       }
     });
@@ -37,20 +37,20 @@ function SecondaryTabs({ authAxios }) {
     return product;
   });
 
-  console.log(...productData);
+  // console.log(...productData);
 
   let singleProduct = productData[0];
   let productHeaders = [];
   if (singleProduct !== undefined) {
     productHeaders = Object.keys(singleProduct);
   }
-  console.log(productHeaders);
+  // console.log(productHeaders);
 
   const prodRow = productData.map((p) => {
     return Object.values(p);
   });
 
-  console.log(prodRow);
+  // console.log(prodRow);
 
   // Tag Config
   const [selected, setSelected] = useState(0);
@@ -83,7 +83,7 @@ function SecondaryTabs({ authAxios }) {
   //Radio Form Config
   const [value, setValue] = useState("disabled");
 
-  console.log(value);
+  // console.log(value);
   const handleChange = useCallback(
     (_checked, newValue) => setValue(newValue),
     []
@@ -92,28 +92,45 @@ function SecondaryTabs({ authAxios }) {
 
   DataTable;
   const productTable = (
-    <Card>
-      <DataTable
-        columnContentTypes={[
-          "numeric",
-          "text",
-          "text",
-          "text",
-          "text",
-          "text",
-          "text",
-          "text",
-          "text",
-          "text",
-          "text",
-          "text",
-          "text",
-          "text",
-        ]}
-        headings={productHeaders}
-        rows={prodRow}
-      />
-    </Card>
+    <div className="tbl-content">
+      <div className="second-tabContent--header ">
+        <Heading>カラムカスタマイズ</Heading>
+      </div>
+      <Card>
+        <div className="tbl-content--tbl">
+          <DataTable
+            columnContentTypes={[
+              "numeric",
+              "text",
+              "text",
+              "text",
+              "text",
+              "text",
+              "text",
+              "text",
+              "text",
+              "text",
+              "text",
+              "text",
+              "text",
+              "text",
+            ]}
+            headings={productHeaders}
+            rows={prodRow}
+          />
+        </div>
+
+        <div className="tbl-btn-grp">
+          <CSVLink
+            data={productData}
+            filename={"products.csv"}
+            className="tbl-btn-grp--csv-button"
+          >
+            Download CSV
+          </CSVLink>
+        </div>
+      </Card>
+    </div>
   );
 
   // End of DataTable
@@ -188,11 +205,6 @@ function SecondaryTabs({ authAxios }) {
         </p>
       </div>
     );
-    csvDownload = (
-      <CSVLink data={products} headers={headers}>
-        Download me
-      </CSVLink>
-    );
 
     productTables = productTable;
   } else if (selected === 1) {
@@ -224,7 +236,6 @@ function SecondaryTabs({ authAxios }) {
         </Tabs>
       </Card>
       {text}
-      {csvDownload}
       {productTables}
     </div>
   );

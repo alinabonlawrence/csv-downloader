@@ -16,3 +16,25 @@
 .text-bold {
   font-weight: 900;
 }
+.tbl-content {
+  margin-bottom: 3rem;
+
+  &--tbl {
+    width: 90%;
+    margin: auto;
+  }
+}
+.tbl-btn-grp {
+  text-align: center;
+  padding: 3rem 0;
+
+  &--csv-button {
+    width: 30%;
+    padding: 1.5rem 5rem;
+    background-color: #5cbec1;
+    color: white;
+    border-style: none;
+    cursor: pointer;
+    text-decoration: none;
+  }
+}
