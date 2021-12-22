@@ -205,14 +205,21 @@ function SecondaryTabs({ authAxios }) {
         </p>
       </div>
     );
+  } else if (selected === 1) {
+    secondaryTabComponent = radioButtonList;
+
+    text = (
+      <div className="tabOne-text">
+        <p>
+          フォーマットを変更すると下の「カラムカスタマイズ」の項目が変わります。
+        </p>
+        <p>
+          カラムの内容を編集されていた場合、元に戻すことは出来ませんのでご注意ください。
+        </p>
+      </div>
+    );
 
     productTables = productTable;
-  } else if (selected === 1) {
-    secondaryTabComponent = (
-      <Page>
-        <p>Hello Tab 2</p>
-      </Page>
-    );
   } else if (selected === 2) {
     secondaryTabComponent = (
       <Page>
