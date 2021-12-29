@@ -4,10 +4,6 @@ import History from "./components/History";
 import SecondaryTabs from "./components/SecondaryTabs";
 
 function index({ authAxios }) {
-  const [products, setProducts] = useState([]);
-
-  // console.log(products);
-
   // Initial Tab Config - Polaris
   const [selected, setSelected] = useState(0);
 
