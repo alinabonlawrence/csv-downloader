@@ -6,6 +6,7 @@ import Shopify, { ApiVersion } from "@shopify/shopify-api";
 import Koa from "koa";
 import next from "next";
 import Router from "koa-router";
+import koaBody from "koa-body";
 
 dotenv.config();
 const port = parseInt(process.env.PORT, 10) || 8081;
@@ -69,6 +70,70 @@ app.prepare().then(async () => {
     ctx.res.statusCode = 200;
   };
 
+  var mysql = require("mysql");
+
+  var con = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "csv_downloader",
+  });
+
+  con.connect(function (err) {
+    if (err) throw err;
+    console.log("Connected!");
+  });
+
+  router.post("/export-history", verifyRequest(), koaBody(), async (ctx) => {
+    const session = await Shopify.Utils.loadCurrentSession(ctx.req, ctx.res);
+    const client = new Shopify.Clients.Rest(session.shop, session.accessToken);
+
+    async function getData() {
+      return new Promise(async (resolve, reject) => {
+        const data = await client.get({
+          path: "shop",
+        });
+        let sId = data.body.shop.id;
+        let resData = ctx.request.body;
+        con.query(
+          `INSERT INTO history (shop_id, export_name) VALUES (${sId}, '${resData.export_name}')`,
+          (err, res) => {
+            if (!err) {
+              resolve({ status: 200 });
+            } else {
+              reject({ status: 500 });
+            }
+          }
+        );
+      });
+    }
+    ctx.body = await getData();
+  });
+
+  router.get("/get-history", verifyRequest(), async (ctx) => {
+    const session = await Shopify.Utils.loadCurrentSession(ctx.req, ctx.res);
+    const client = new Shopify.Clients.Rest(session.shop, session.accessToken);
+    async function getData() {
+      return new Promise(async (resolve, reject) => {
+        const data = await client.get({
+          path: "shop",
+        });
+        let sId = data.body.shop.id;
+        con.query(
+          `SELECT * FROM history where shop_id = ${sId}`,
+          (err, result) => {
+            if (!err) {
+              resolve({ status: 200, body: result });
+            } else {
+              reject({ status: 500 });
+            }
+          }
+        );
+      });
+    }
+    ctx.body = await getData();
+  });
+
   router.post("/webhooks", async (ctx) => {
     try {
       await Shopify.Webhooks.Registry.process(ctx.req, ctx.res);
@@ -86,7 +151,7 @@ app.prepare().then(async () => {
     }
   );
 
-  router.get("/products", async (ctx) => {
+  router.get("/products", verifyRequest(), async (ctx) => {
     let products = [];
     let newPageInfo;
 
@@ -95,15 +160,17 @@ app.prepare().then(async () => {
 
     const data = await client.get({
       path: "products",
-      query: { limit: "1" },
+      query: { limit: "250" },
     });
     products = [...data.body.products];
-    newPageInfo = data.pageInfo.nextPage.query.page_info;
+    newPageInfo =
+      data.pageInfo.nextPage !== undefined &&
+      data.pageInfo.nextPage.query.page_info;
 
     while (newPageInfo) {
       let addData = await client.get({
         path: "products",
-        query: { limit: "1", page_info: newPageInfo },
+        query: { limit: "250", page_info: newPageInfo },
       });
 
       products = [...products, ...addData.body.products];
@@ -112,11 +179,26 @@ app.prepare().then(async () => {
         addData.pageInfo.nextPage.query.page_info;
     }
 
-    console.log(products);
+    // console.log(products);
     ctx.status = 200;
     ctx.body = products;
   });
 
+  // router.get("/products-limit", verifyRequest(), async (ctx) => {
+  //   let products = [];
+  //   let newPageInfo;
+
+  //   const session = await Shopify.Utils.loadCurrentSession(ctx.req, ctx.res);
+  //   const client = new Shopify.Clients.Rest(session.shop, session.accessToken);
+
+  //   const data = await client.get({
+  //     path: "products",
+  //     query: { fields: "id%2Cimages%2Ctitle" },
+  //   });
+
+  //   ctx.status = 200;
+  //   ctx.body = products;
+  // });
   router.get("(/_next/static/.*)", handleRequest); // Static content is clear
   router.get("/_next/webpack-hmr", handleRequest); // Webpack content is clear
   router.get("(.*)", async (ctx) => {

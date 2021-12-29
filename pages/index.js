@@ -1,6 +1,7 @@
-import { Button, Heading, Page, Tabs } from "@shopify/polaris";
-import React, { useCallback, useEffect, useState } from "react";
-import SecondaryTabs from "../components/SecondaryTabs";
+import { Heading, Page, Tabs } from "@shopify/polaris";
+import React, { useCallback, useState } from "react";
+import History from "./components/History";
+import SecondaryTabs from "./components/SecondaryTabs";
 
 function index({ authAxios }) {
   const [products, setProducts] = useState([]);
@@ -41,17 +42,17 @@ function index({ authAxios }) {
   if (selected === 0) {
     primaryTabComponent = (
       <div className="tabContent">
+        <History authAxios={authAxios} />
+      </div>
+    );
+  } else if (selected === 1) {
+    primaryTabComponent = (
+      <div className="tabContent">
         <div className="tabContent--header">
           <Heading>フォーマット選択</Heading>
         </div>
         <SecondaryTabs authAxios={authAxios} />
       </div>
-    );
-  } else if (selected === 1) {
-    primaryTabComponent = (
-      <Page>
-        <p>Hello Tab 2</p>
-      </Page>
     );
   } else if (selected === 2) {
     primaryTabComponent = (
