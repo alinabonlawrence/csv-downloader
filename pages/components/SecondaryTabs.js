@@ -1,5 +1,6 @@
 import { Card, Page, Tabs } from "@shopify/polaris";
 import React, { useCallback, useState } from "react";
+import Orders from "./Orders";
 import Products from "./Products";
 
 function SecondaryTabs({ authAxios }) {
@@ -32,14 +33,10 @@ function SecondaryTabs({ authAxios }) {
 
   // Tab Body
   let secondaryTabComponent = "";
-  let text = "";
-  let productTables = "";
 
   if (selected === 0) {
-    secondaryTabComponent = (
-      <Page>
-        <p>Hello Tab Orders</p>
-      </Page>
+    secondaryTabComponent = secondaryTabComponent = (
+      <Orders authAxios={authAxios} />
     );
   } else if (selected === 1) {
     secondaryTabComponent = <Products authAxios={authAxios} />;

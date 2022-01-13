@@ -1,7 +1,10 @@
 import {
+  Button,
   Card,
   DataTable,
   Heading,
+  Icon,
+  Label,
   RadioButton,
   Stack,
   TextField,
@@ -9,34 +12,41 @@ import {
 import React, { useCallback, useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { CSVLink } from "react-csv";
+import { DragHandleMinor, MobileCancelMajor } from "@shopify/polaris-icons";
 
 function Products({ authAxios }) {
   const [products, setProducts] = useState([]);
-  const [productFilename, setProductFilename] = useState("product");
+  const [productFilename, setProductFilename] = useState("");
   const [radioValue, setRadioValue] = useState("disabled");
+  const [columnCounter, setColumnCounter] = useState(0);
 
   const productHeadersTwo = [
-    { label: "id", key: "id" },
-    { label: "title", key: "title" },
-    { label: "body_html", key: "body_html" },
-    { label: "vendor", key: "vendor" },
-    { label: "product_type", key: "product_type" },
-    { label: "created_at", key: "created_at" },
-    { label: "handle", key: "handle" },
-    { label: "updated_at", key: "updated_at" },
-    { label: "published_at", key: "published_at" },
-    { label: "template_suffix", key: "template_suffix" },
-    { label: "status", key: "status" },
-    { label: "published_scope", key: "published_scope" },
-    { label: "tags", key: "tags" },
-    { label: "admin_graphql_api_id", key: "admin_graphql_api_id" },
-    { label: "image", key: "image" },
-    { label: "options", key: "options" },
-    { label: "variants", key: "variants" },
-    { label: "images", key: "images" },
+    { label: "id", key: "id", isChecked: true },
+    { label: "title", key: "title", isChecked: true },
+    { label: "body_html", key: "body_html", isChecked: true },
+    { label: "vendor", key: "vendor", isChecked: true },
+    { label: "product_type", key: "product_type", isChecked: true },
+    { label: "created_at", key: "created_at", isChecked: true },
+    { label: "handle", key: "handle", isChecked: true },
+    { label: "updated_at", key: "updated_at", isChecked: true },
+    { label: "published_at", key: "published_at", isChecked: true },
+    { label: "template_suffix", key: "template_suffix", isChecked: true },
+    { label: "status", key: "status", isChecked: true },
+    { label: "published_scope", key: "published_scope", isChecked: true },
+    { label: "tags", key: "tags", isChecked: true },
+    {
+      label: "admin_graphql_api_id",
+      key: "admin_graphql_api_id",
+      isChecked: true,
+    },
+    { label: "image", key: "image", isChecked: true },
+    { label: "options", key: "options", isChecked: true },
+    { label: "variants", key: "variants", isChecked: true },
+    { label: "images", key: "images", isChecked: true },
   ];
   const [newProductHeaders, setNewProductHeaders] = useState(productHeadersTwo);
-  const csvName = productFilename + ".csv";
+  const csvName =
+    productFilename !== "" ? productFilename + ".csv" : "product.csv";
 
   useEffect(() => {
     // Fetch Products
@@ -48,6 +58,46 @@ function Products({ authAxios }) {
   }, [authAxios]);
 
   const productArray = products.map((product) => {
+    let imageData = product.images
+      .map((i) => {
+        let data = [];
+        for (const [key, value] of Object.entries(i)) {
+          data.push(`${key} : ${value}`);
+        }
+        return data;
+      })
+      .join();
+
+    let optionsData = product.options
+      .map((o) => {
+        let data = [];
+        for (const [key, value] of Object.entries(o)) {
+          data.push(`${key} : ${value}`);
+        }
+        return data;
+      })
+      .join();
+
+    let variantsData = product.variants
+      .map((v) => {
+        let data = [];
+        for (const [key, value] of Object.entries(v)) {
+          data.push(`${key} : ${value}`);
+        }
+        return data;
+      })
+      .join();
+
+    let imagesData = product.images
+      .map((i) => {
+        let data = [];
+        for (const [key, value] of Object.entries(i)) {
+          data.push(`${key} : ${value}`);
+        }
+        return data;
+      })
+      .join();
+
     return {
       id: product.id,
       title: product.title,
@@ -63,19 +113,15 @@ function Products({ authAxios }) {
       published_scope: product.published_scope,
       tags: product.tags,
       admin_graphql_api_id: product.admin_graphql_api_id,
-      image: product.image.toString(),
-      options: product.options.join(),
-      variants: product.variants.join(),
-      images: product.images.join(),
+      image: imageData,
+      options: optionsData,
+      variants: variantsData,
+      images: imagesData,
     };
   });
 
-  let sortedHeader = [];
-
-  // Push newProductHeader Keys
-  newProductHeaders.map((head) => {
-    return sortedHeader.push(head.key);
-  });
+  // Get newProductHeader Keys
+  const sortedHeader = newProductHeaders.map((head) => head.key);
 
   // Sort Product Data
   const sortedProducts = productArray.map((product) => {
@@ -83,9 +129,12 @@ function Products({ authAxios }) {
   });
 
   // Product Table Rows
-  const prodRow = sortedProducts.map((p) => {
+  const productRows = sortedProducts.map((p) => {
     return Object.values(p);
   });
+
+  // Get Sorted Renamed Headers
+  const sortedRenamedHeaders = newProductHeaders.map((head) => head.label);
 
   // Product Table
   const productTable = (
@@ -113,8 +162,8 @@ function Products({ authAxios }) {
               "text",
               "text",
             ]}
-            headings={sortedHeader}
-            rows={prodRow}
+            headings={sortedRenamedHeaders}
+            rows={productRows}
           />
         </Card.Section>
       </Card>
@@ -201,7 +250,7 @@ function Products({ authAxios }) {
   );
 
   //  Drag N Drop Drag Function
-  function handleOnDragEnd(result) {
+  const handleOnDragEnd = (result) => {
     if (!result.destination) return;
 
     const items = Array.from(newProductHeaders);
@@ -209,7 +258,7 @@ function Products({ authAxios }) {
     items.splice(result.destination.index, 0, reorderedItem);
 
     setNewProductHeaders(items);
-  }
+  };
 
   // Rename Header Function
   const renameHeader = (header, value) => {
@@ -221,6 +270,15 @@ function Products({ authAxios }) {
     });
     setNewProductHeaders(items);
   };
+
+  // Add new column
+  const addNewColumn = () => {
+    const newColumn = { label: "New Column", key: `newColumn${columnCounter}` };
+    setColumnCounter(columnCounter + 1);
+    return productHeadersTwo.push(newColumn);
+  };
+
+  console.log(newProductHeaders);
 
   // Drag N Drop
   const dragNDrop = (
@@ -254,6 +312,7 @@ function Products({ authAxios }) {
                             className="header-table--list"
                           >
                             <div className="table-card">
+                              <Icon source={DragHandleMinor} color="base" />
                               <div className="table-card--row">
                                 <div className="header-name">{header.key}</div>
                               </div>
@@ -268,6 +327,9 @@ function Products({ authAxios }) {
                                   }
                                 />
                               </div>
+                              <button className="delete-header">
+                                <Icon source={MobileCancelMajor} color="base" />
+                              </button>
                             </div>
                           </li>
                         )}
@@ -280,6 +342,12 @@ function Products({ authAxios }) {
             </Droppable>
           </DragDropContext>
         </Card.Section>
+        <div className="tbl-btn-grp">
+          <button className="tbl-btn-grp--add-button">空カラムを追加</button>
+          <button className="tbl-btn-grp--csv-button" onClick={addNewColumn}>
+            新しいカラムを追加
+          </button>
+        </div>
       </Card>
     </div>
   );
@@ -289,31 +357,63 @@ function Products({ authAxios }) {
     (newValue) => setProductFilename(newValue),
     []
   );
+  //Radio Form Config
+  const handleChange2 = useCallback(
+    (_checked, newValue) => setRadioValue(newValue),
+    []
+  );
 
   // Rename file
   const filenameForm = (
     <div className="rename-form">
+      <div className="second-tabContent--header ">
+        <Heading>オプション</Heading>
+      </div>
       <Card>
         <Card.Section>
-          <div className="txtbox">
+          <div className="txtbox1">
+            <label className="txtbox1--label">ファイル名</label>
             <TextField
-              label="Rename File"
               value={productFilename}
               onChange={fileNameChange}
               autoComplete="off"
-              className="txtbox--txtfield"
-              placeholder={"product.csv"}
+              className="txtbox1--txtfield"
+              placeholder={"export_YYMMDD"}
             />
           </div>
+          <div className="txtbox2">
+            <label className="txtbox2--label">ヘッダー行</label>
+            <span className="txtbox2--radio-btn">
+              <RadioButton
+                label="ヘッダー行を出力する"
+                checked={radioValue === "ヘッダー行を出力する"}
+                id="ヘッダー行を出力する"
+                name="accounts"
+                className="radio"
+                onChange={handleChange}
+              />
+              <RadioButton
+                label="ヘッダー行を出力しない"
+                checked={radioValue === "ヘッダー行を出力しない"}
+                id="ヘッダー行を出力しない"
+                name="accounts"
+                className="radio"
+                onChange={handleChange}
+              />
+            </span>
+          </div>
+
           <div className="tbl-btn-grp">
+            <button className="tbl-btn-grp--add-button">この内容を保存</button>
             <CSVLink
               headers={newProductHeaders}
               data={sortedProducts}
-              filename={productFilename + ".csv"}
-              className="tbl-btn-grp--csv-button"
+              filename={csvName}
               onClick={saveHistory}
             >
-              Download CSV
+              <button className="tbl-btn-grp--csv-button" onClick={saveHistory}>
+                エクスポート
+              </button>
             </CSVLink>
           </div>
         </Card.Section>

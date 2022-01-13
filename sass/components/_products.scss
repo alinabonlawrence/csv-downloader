@@ -7,12 +7,43 @@
   }
 }
 
-.txtbox {
-  width: 80%;
-  margin: auto;
+.txtbox1 {
+  display: flex;
+
+  &--label {
+    margin-right: 50px;
+    font-weight: 700;
+    padding: 10px 5px;
+    width: 10%;
+  }
 
   &--txtfield {
     margin-top: 3rem;
+    width: 80%;
+    padding: 10px 5px;
+    border: 1px solid gray;
+    border-radius: 5px;
+  }
+}
+.txtbox2 {
+  display: flex;
+  margin-top: 16px;
+
+  &--label {
+    margin-right: 50px;
+    font-weight: 700;
+    padding: 5px 5px;
+    width: 10%;
+  }
+
+  &--radio-btn {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .radio {
+    font-weight: 700;
   }
 }
 .tbl-btn-grp {
@@ -20,13 +51,25 @@
   padding: 3rem 0;
 
   &--csv-button {
-    width: 30%;
     padding: 1.5rem 5rem;
+    height: 50px;
+    min-width: 25%;
+    background-color: #5767bc;
+    color: white;
+    border-style: none;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  &--add-button {
+    padding: 1.5rem 5rem;
+    min-width: 25%;
+    height: 50px;
     background-color: #5cbec1;
     color: white;
     border-style: none;
     cursor: pointer;
     text-decoration: none;
+    margin-right: 12px;
   }
 }
 .prod-table {
@@ -36,6 +79,8 @@
   margin-bottom: 30px;
 }
 .header-table {
+  list-style-type: none;
+
   &--list {
     list-style-type: none;
     padding: auto;
@@ -73,4 +118,12 @@
       }
     }
   }
+}
+
+.delete-header {
+  cursor: pointer;
+  border: none;
+  background-color: #e6e6e6;
+  padding-right: 10px;
+  border-radius: 5px;
 }

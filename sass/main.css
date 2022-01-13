@@ -49,13 +49,54 @@
   margin: auto;
 }
 
-.txtbox {
-  width: 80%;
-  margin: auto;
+.txtbox1 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
 }
 
-.txtbox--txtfield {
+.txtbox1--label {
+  margin-right: 50px;
+  font-weight: 700;
+  padding: 10px 5px;
+  width: 10%;
+}
+
+.txtbox1--txtfield {
   margin-top: 3rem;
+  width: 80%;
+  padding: 10px 5px;
+  border: 1px solid gray;
+  border-radius: 5px;
+}
+
+.txtbox2 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  margin-top: 16px;
+}
+
+.txtbox2--label {
+  margin-right: 50px;
+  font-weight: 700;
+  padding: 5px 5px;
+  width: 10%;
+}
+
+.txtbox2--radio-btn {
+  width: 90%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.txtbox2 .radio {
+  font-weight: 700;
 }
 
 .tbl-btn-grp {
@@ -64,13 +105,26 @@
 }
 
 .tbl-btn-grp--csv-button {
-  width: 30%;
   padding: 1.5rem 5rem;
+  height: 50px;
+  min-width: 25%;
+  background-color: #5767bc;
+  color: white;
+  border-style: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.tbl-btn-grp--add-button {
+  padding: 1.5rem 5rem;
+  min-width: 25%;
+  height: 50px;
   background-color: #5cbec1;
   color: white;
   border-style: none;
   cursor: pointer;
   text-decoration: none;
+  margin-right: 12px;
 }
 
 .prod-table {
@@ -79,6 +133,10 @@
 
 .rename-form {
   margin-bottom: 30px;
+}
+
+.header-table {
+  list-style-type: none;
 }
 
 .header-table--list {
@@ -124,5 +182,13 @@
   border-radius: 5px;
   padding: 10px 20px;
   font-size: 1.5rem;
+}
+
+.delete-header {
+  cursor: pointer;
+  border: none;
+  background-color: #e6e6e6;
+  padding-right: 10px;
+  border-radius: 5px;
 }
 /*# sourceMappingURL=main.css.map */
